@@ -67,7 +67,7 @@ class DatabaseHandler:
             self.user.save()
 
     def setDescription(self, description):
-        self.user.description = description
+        self.user.operationstatus['description'] = description
         if self.autosave:
             self.user.save()
 
