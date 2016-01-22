@@ -45,6 +45,8 @@ class DatabaseHandler:
                 'gistauth': 'null',
                 'pastebinauth': '["username", "password"]',  # json.dumps(('username', 'password'))
                 'operationstatus': {
+                    'description': '',
+                    'public': True,
                 },
             }
         )
