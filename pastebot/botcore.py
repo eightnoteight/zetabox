@@ -155,7 +155,7 @@ def creategist(message):
     # TODO: assert that the current operation is gist creation operation.
     # TODO: send the typing reply
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
-    operationstatus = userhandle.operationstatus
+    operationstatus = userhandle.user.operationstatus
     data = {
         "description": operationstatus['description'],
         "public": operationstatus['public'],
