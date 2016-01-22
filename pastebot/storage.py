@@ -34,7 +34,7 @@ class User(Model):
         db_table = '__test_pastebot__'
 
 pgs_db.connect()
-pgs_db.create_tables([User])
+User.create_table(True)
 
 # TODO: make this DatabaseHandler tornado yieldable class
 class DatabaseHandler:
