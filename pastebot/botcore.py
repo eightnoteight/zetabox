@@ -125,9 +125,10 @@ def setdescription(message):
     _, _, description = message.text.partition(' ')
     if description == '':
         yield executor.submit(bot.reply_to, message, "invalid request:\ndescription can't be empty")
-        yield tornado.gen.Return()
+        raise tornado.gen.Return()
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     yield executor.submit(userhandle.setDescription, description)
+    yield executor.submit(bot.reply_to, message, 'description set :)')
 
 @bot.message_handler(commands=['gist'])
 @tornado.gen.coroutine

@@ -39,7 +39,7 @@ User.create_table(True)
 # TODO: make this DatabaseHandler tornado yieldable class
 class DatabaseHandler:
     def __init__(self, username, autosave=True):
-        self.user = User.get_or_create(
+        self.user, created = User.get_or_create(
             username=username,
             defaults={
                 'gistauth': 'null',
