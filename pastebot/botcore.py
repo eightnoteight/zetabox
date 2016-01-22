@@ -201,7 +201,7 @@ def receivefile(message):
     file_info = yield executor.submit(bot.get_file, message.document.file_id)
     response = yield executor.submit(
         requests.get, 'https://api.telegram.org/file/bot{0}/{1}'.format(
-            config['zbpaste_api_token'], file_info.file_path))
+            config['zbpastebot_api_token'], file_info.file_path))
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     userhandle.user.operationstatus[file_name + 'file'] = response.content
     yield executor.submit(userhandle.user.save)
