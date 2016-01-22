@@ -158,7 +158,7 @@ def creategist(message):
     operationstatus = userhandle.user.operationstatus
     data = {
         "description": operationstatus['description'],
-        "public": operationstatus['public'],
+        "public": bool(operationstatus['public']),
         "files": {}
     }
     for key, value in operationstatus.items():

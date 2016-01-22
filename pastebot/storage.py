@@ -46,7 +46,7 @@ class DatabaseHandler:
                 'pastebinauth': '["username", "password"]',  # json.dumps(('username', 'password'))
                 'operationstatus': {
                     'description': '',
-                    'public': True,
+                    'public': '1',
                 },
             }
         )
