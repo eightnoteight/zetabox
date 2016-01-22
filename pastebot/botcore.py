@@ -9,7 +9,7 @@ import requests
 from pastebot.storage import DatabaseHandler
 from pastebot.config import config
 
-bot = telebot.TeleBot(config['zbpaste_api_token'], threaded=False)
+bot = telebot.TeleBot(config['zbpastebot_api_token'], threaded=False)
 
 executor = ThreadPoolExecutor(max_workers=5)
 
