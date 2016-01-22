@@ -58,7 +58,7 @@ def send_help(message):
 @bot.message_handler(commands=['gistauth'])
 @tornado.gen.coroutine
 def gistauth(message):
-    _, token = message.text.partition(' ')
+    _, _, token = message.text.partition(' ')
     if token:
         # blocking operation
         # dispath a request to github, to check the authenticity of the token
