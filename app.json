@@ -4,6 +4,6 @@
   "logo": "http://i.imgur.com/76pb0NS.png",
   "image": "heroku/python",
   "repository": "https://github.com/eightnoteight/zetabox",
-  "keywords": ["python", "wheezy", "worker"],
+  "keywords": ["python", "tornado", "worker"],
   "addons": [ "heroku-postgresql" ]
 }

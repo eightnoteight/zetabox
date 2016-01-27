@@ -16,7 +16,7 @@ executor = ThreadPoolExecutor(max_workers=5)
 @bot.message_handler(commands=['start', 'help'])
 @tornado.gen.coroutine
 def send_help(message):
-    yield executor.submit(bot.reply_to, message, textwrap.dedent(
+    yield executor.submit(bot.send_message, message.message_id, textwrap.dedent(
         """
         ========================================
         /gistauth ::token::
@@ -67,17 +67,17 @@ def gistauth(message):
             'Authorization': 'token {}'.format(token),
         })
         if response.status_code == 200:
-            # if 'gist' in response.headers['X-OAuth-Scopes']
+            # if 'gist' not in response.headers['X-OAuth-Scopes']
             #     bot.reply_to(message, 'successfully authenticated')
             # else:
             #     bot.reply_to(message, 'invalid token: X-OAuth-Scopes doesn't contain gist)
             userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
             yield executor.submit(userhandle.setGistAuth, token)  # autosave is on, so yield it.
-            yield executor.submit(bot.reply_to, message, "successfully authenticated")
+            yield executor.submit(bot.send_message, message.message_id, "successfully authenticated")
         else:
-            yield executor.submit(bot.reply_to, message, "invalid token")
+            yield executor.submit(bot.send_message, message.message_id, "invalid token")
     else:
-        yield executor.submit(bot.reply_to, message, textwrap.dedent("""
+        yield executor.submit(bot.send_message, message.message_id, textwrap.dedent("""
         ========================================
         /gistauth ::token::
         ----------------------------------------
@@ -96,7 +96,7 @@ def quickgist(message):
     _, _, description = cmd.partition(' ')
     if gist == '' or description == '':
         yield executor.submit(
-            bot.reply_to, message,
+            bot.send_message, message.message_id,
             'invalid request:\nempty content or description')
         raise tornado.gen.Return()
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
@@ -115,26 +115,32 @@ def quickgist(message):
         data=json.dumps(data), headers={
             'Authorization': 'token {}'.format(str(userhandle.getGistAuth())),
         })
-    html_url = response.json()['html_url']
-    shorturl = yield executor.submit(shortenurl, html_url)
-    yield bot.reply_to(message, 'url: {}\nshorturl: {}\n'.format(html_url, shorturl))
+    if response.status_code == 200:
+        html_url = response.json()['html_url']
+        shorturl = yield executor.submit(shortenurl, html_url)
+        yield executor.submit(bot.send_message, message.message_id, '\n'.join([html_url, shorturl]))
+    elif response.status_code == :
+        pass
+    else:
+        pass
+
 
 @bot.message_handler(commands=['description'])
 @tornado.gen.coroutine
 def setdescription(message):
     _, _, description = message.text.partition(' ')
     if description == '':
-        yield executor.submit(bot.reply_to, message, "invalid request:\ndescription can't be empty")
+        yield executor.submit(bot.send_message, message.message_id, "invalid request:\ndescription can't be empty")
         raise tornado.gen.Return()
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     yield executor.submit(userhandle.setDescription, description)
-    yield executor.submit(bot.reply_to, message, 'description set :)')
+    yield executor.submit(bot.send_message, message.message_id, 'description set :)')
 
 @bot.message_handler(commands=['gist'])
 @tornado.gen.coroutine
 def startgist(message):
     yield executor.submit(
-        bot.reply_to, message,
+        bot.send_message, message.message_id,
         textwrap.dedent("""
             Ok now set description with
             /description
@@ -169,7 +175,7 @@ def creategist(message):
     response = yield executor.submit(requests.post, 'https://api.github.com/gists', data=json.dumps(data))
     html_url = response.json()['html_url']
     shorturl = shortenurl(html_url)
-    yield bot.reply_to(message, 'url: {}\nshorturl: {}\n'.format(html_url, shorturl))
+    yield executor.submit(bot.send_message, message.message_id, 'url: {}\nshorturl: {}\n'.format(html_url, shorturl))
 
 @bot.message_handler(commands=['pasteauth'])
 def pastebinauth(message):
@@ -205,4 +211,4 @@ def receivefile(message):
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     userhandle.user.operationstatus[file_name + 'file'] = response.content
     yield executor.submit(userhandle.user.save)
-    yield executor.submit(bot.reply_to, message, file_name + ' received!')
+    yield executor.submit(bot.send_message, message.message_id, file_name + ' received!')
