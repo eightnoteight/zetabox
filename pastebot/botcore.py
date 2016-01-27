@@ -113,16 +113,17 @@ def quickgist(message):
         requests.post,
         'https://api.github.com/gists',
         data=json.dumps(data), headers={
-            'Authorization': 'token {}'.format(str(userhandle.getGistAuth())),
+            'authorization': 'token {}'.format(str(userhandle.getGistAuth())),
         })
     if response.status_code == 200:
         html_url = response.json()['html_url']
         shorturl = yield executor.submit(shortenurl, html_url)
         yield executor.submit(bot.send_message, message.message_id, '\n'.join([html_url, shorturl]))
-    elif response.status_code == :
-        pass
+    elif response.status_code == 401:
+        yield executor.submit(bot.send_message, message.message_id, "zetabox: 401 unauthorized")
     else:
-        pass
+        # log this event and send the log_id to reproduce the error.
+        yield executor.submit(bot.send_message, message.message_id, "got unknown error, report this to admin @eightnoteight")
 
 
 @bot.message_handler(commands=['description'])
