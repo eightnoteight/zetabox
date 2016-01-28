@@ -44,10 +44,7 @@ class DatabaseHandler:
             defaults={
                 'gistauth': 'null',
                 'pastebinauth': '["username", "password"]',  # json.dumps(('username', 'password'))
-                'operationstatus': {
-                    'description': '',
-                    'public': '1',
-                },
+                'operationstatus': {},
             }
         )
         self.autosave = autosave

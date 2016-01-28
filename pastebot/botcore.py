@@ -131,8 +131,7 @@ def quickgist(message):
 def setdescription(message):
     _, _, description = message.text.partition(' ')
     if description == '':
-        yield executor.submit(bot.send_message, message.chat.id, "invalid request:\ndescription can't be empty")
-        raise tornado.gen.Return()
+        yield executor.submit(bot.send_message, message.chat.id, "warning: empty description!!")
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     yield executor.submit(userhandle.setDescription, description)
     yield executor.submit(bot.send_message, message.chat.id, 'description set :)')
@@ -164,18 +163,24 @@ def creategist(message):
     userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
     operationstatus = userhandle.user.operationstatus
     data = {
-        "description": operationstatus['description'],
-        "public": bool(operationstatus['public']),
+        "description": operationstatus.get('description', ''),
+        "public": bool(operationstatus.get('public', 1)),
         "files": {}
     }
+    noFiles = True
     for key, value in operationstatus.items():
         if key.endswith('file'):
             data['files'][key[:-4]] = {
                 'content': value,
             }
+            noFiles = False
+    if countFiles == 0:
+        yield executor.submit(bot.send_message, message.chat.id, 'error: no files to create a gist')
+        raise tornado.gen.Return()
     response = yield executor.submit(requests.post, 'https://api.github.com/gists', data=json.dumps(data))
     html_url = response.json()['html_url']
     shorturl = shortenurl(html_url)
+    yield executor.submit(userhandle.setOperationStatus, {})
     yield executor.submit(bot.send_message, message.chat.id, 'url: {}\nshorturl: {}\n'.format(html_url, shorturl))
 
 @bot.message_handler(commands=['pasteauth'])
