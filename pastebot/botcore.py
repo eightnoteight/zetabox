@@ -177,7 +177,12 @@ def creategist(message):
     if noFiles:
         yield executor.submit(bot.send_message, message.chat.id, 'error: no files to create a gist')
         raise tornado.gen.Return()
-    response = yield executor.submit(requests.post, 'https://api.github.com/gists', data=json.dumps(data))
+    response = yield executor.submit(
+        requests.post,
+        'https://api.github.com/gists',
+        data=json.dumps(data), headers={
+            'authorization': 'token {}'.format(str(userhandle.getGistAuth())),
+        })
     html_url = response.json()['html_url']
     shorturl = shortenurl(html_url)
     yield executor.submit(userhandle.setOperationStatus, {})
