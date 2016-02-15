@@ -183,6 +183,7 @@ def creategist(message):
         data=json.dumps(data), headers={
             'authorization': 'token {}'.format(str(userhandle.getGistAuth())),
         })
+    print(response.json())
     html_url = response.json()['html_url']
     shorturl = shortenurl(html_url)
     yield executor.submit(userhandle.setOperationStatus, {})
