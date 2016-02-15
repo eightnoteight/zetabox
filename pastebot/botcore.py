@@ -139,6 +139,8 @@ def setdescription(message):
 @bot.message_handler(commands=['gist'])
 @tornado.gen.coroutine
 def startgist(message):
+    userhandle = yield executor.submit(DatabaseHandler, message.from_user.username)
+    yield executor.submit(userhandle.setOperationStatus, {})
     yield executor.submit(
         bot.send_message, message.chat.id,
         textwrap.dedent("""
